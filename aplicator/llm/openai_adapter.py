@@ -17,13 +17,17 @@ botones — ignoralos). Devolvé UN JSON con esta forma exacta:
       "type": "text" | "multiple_choice" | "video",
       "original_text": str,
       "is_required": bool,
-      // si type == "text" o "multiple_choice":
+      // si type == "text":
       "category": uno de [problem, solution, why_now, why_you, team, traction,
         business_model, market_size, competition, moat, gtm, product_demo,
         tech, milestones, ask, use_of_funds, risks, failure_story,
         why_this_program, legal_admin, other],
       "max_chars": int | null,   // si el form da un límite en palabras, convertilo a caracteres (palabras * 6)
-      // si type == "multiple_choice" además:
+      // si type == "multiple_choice":
+      "archetype": uno de [problem, solution, why_now, why_you, team, traction,
+        business_model, market_size, competition, moat, gtm, product_demo,
+        tech, milestones, ask, use_of_funds, risks, failure_story,
+        why_this_program, legal_admin, other],
       "options": [str],
       "allow_multiple": bool,
       // si type == "video":
