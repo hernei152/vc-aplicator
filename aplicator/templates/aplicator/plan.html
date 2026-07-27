@@ -1,0 +1,43 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Plan</h1>
+
+<h2>Qué respondo una sola vez</h2>
+<table>
+  <tr><th>Categoría</th><th>Aplicaciones</th><th>Límite (min–max chars)</th></tr>
+  {% for group in text_groups %}
+  <tr>
+    <td>{{ group.category }}</td>
+    <td>{{ group.accelerator_names|join:", " }}</td>
+    <td>{{ group.min_max_chars }}–{{ group.max_max_chars }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>Qué produzco una sola vez (video)</h2>
+<table>
+  <tr><th>Focus</th><th>Orientación</th><th>Idioma</th><th>Quién</th><th>Grabar (seg)</th><th>Master</th><th>Cortes derivados</th></tr>
+  {% for rec in recordings %}
+  <tr>
+    <td>{{ rec.focus }}</td>
+    <td>{{ rec.orientation }}</td>
+    <td>{{ rec.language }}</td>
+    <td>{{ rec.who }}</td>
+    <td>{{ rec.record_seconds }}</td>
+    <td>{{ rec.master_question.accelerator.accelerator_name }}</td>
+    <td>
+      {% for cut in rec.derived_cut_questions %}
+        {{ cut.accelerator.accelerator_name }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>Costo marginal (menor a mayor esfuerzo exclusivo)</h2>
+<ol>
+  {% for accelerator in ranked_accelerators %}
+  <li>{{ accelerator.accelerator_name }} — deadline: {{ accelerator.deadline|default:"sin fecha" }}</li>
+  {% endfor %}
+</ol>
+{% endblock %}

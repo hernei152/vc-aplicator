@@ -12,4 +12,5 @@ urlpatterns = [
         views.accelerator_review_view,
         name="accelerator_review",
     ),
+    path("plan/", views.plan_view, name="plan"),
 ]

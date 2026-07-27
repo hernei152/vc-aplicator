@@ -4,6 +4,7 @@ from django.forms import modelformset_factory
 from aplicator.models import TeamMember, CompanyContextBlock, Accelerator, Question
 from aplicator.forms import TeamMemberForm, CompanyContextBlockForm
 from aplicator.llm.factory import get_llm_port
+from aplicator.planner import group_text_questions, group_video_questions, rank_accelerators
 
 
 def context_view(request):
@@ -103,4 +104,18 @@ def accelerator_review_view(request, accelerator_id):
         request,
         "aplicator/accelerator_review.html",
         {"accelerator": accelerator, "formset": formset},
+    )
+
+
+def plan_view(request):
+    questions = list(Question.objects.select_related("accelerator").all())
+    accelerators = Accelerator.objects.all()
+    return render(
+        request,
+        "aplicator/plan.html",
+        {
+            "text_groups": group_text_questions(questions),
+            "recordings": group_video_questions(questions),
+            "ranked_accelerators": rank_accelerators(accelerators, questions),
+        },
     )
