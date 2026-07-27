@@ -79,10 +79,17 @@ def _resolve_duration(group):
     ordered = sorted(group, key=lambda q: q.id)
     ordered = sorted(ordered, key=sort_key, reverse=True)
     master = ordered[0]
-    record_seconds = (
-        master.max_seconds if master.max_seconds is not None else (master.min_seconds or 0)
-    )
-    return master, record_seconds, ordered[1:]
+    derived_cuts = ordered[1:]
+
+    if master.max_seconds is not None:
+        record_seconds = master.max_seconds
+    else:
+        # When master is unbounded, ensure recording covers all group members' minimums.
+        # This preserves the "trim down, never extend" invariant: the recording must be
+        # at least long enough to satisfy the highest min_seconds requirement in the group.
+        all_mins = [master.min_seconds or 0] + [q.min_seconds or 0 for q in derived_cuts]
+        record_seconds = max(all_mins)
+    return master, record_seconds, derived_cuts
 
 
 def group_video_questions(questions):

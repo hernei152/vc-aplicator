@@ -100,3 +100,19 @@ class GroupVideoQuestionsTest(TestCase):
         self.assertEqual(rec.master_question, long)
         self.assertEqual(rec.record_seconds, 180)
         self.assertEqual(rec.derived_cut_questions, [short])
+
+    def test_unbounded_master_covers_bounded_minimums(self):
+        """Regression test: unbounded master must record long enough for all group members' minimums.
+
+        When a video with unbounded max_seconds is chosen as master, the recording duration
+        must be at least as long as the highest min_seconds of any other video in the group,
+        to preserve the "trim down, never extend" invariant.
+        """
+        bounded = self._video(min_seconds=90, max_seconds=180)
+        unbounded = self._video(min_seconds=5, max_seconds=None)
+        recordings = group_video_questions(Question.objects.all())
+        self.assertEqual(len(recordings), 1)
+        rec = recordings[0]
+        # The recording must be long enough to cover the bounded video's minimum.
+        # Without the fix, this would fail because record_seconds would be 5 (unbounded.min_seconds).
+        self.assertGreaterEqual(rec.record_seconds, 90)
