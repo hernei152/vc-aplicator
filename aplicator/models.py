@@ -110,3 +110,21 @@ class Question(models.Model):
 
     def __str__(self):
         return f"[{self.type}] {self.original_text[:50]}"
+
+
+class CanonicalAnswer(models.Model):
+    category = models.CharField(
+        max_length=30, choices=QuestionArchetype.choices, unique=True
+    )
+    text = models.TextField()
+
+    def __str__(self):
+        return self.category
+
+
+class GeneratedAnswer(models.Model):
+    question = models.OneToOneField(Question, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return f"Answer for {self.question_id}"
