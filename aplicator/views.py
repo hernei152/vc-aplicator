@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.forms import modelformset_factory
 from django.utils.dateparse import parse_date
 from django.contrib import messages
@@ -86,6 +87,30 @@ def context_block_delete_view(request, block_id):
     if request.method == "POST":
         CompanyContextBlock.objects.filter(pk=block_id).delete()
     return redirect("aplicator:context")
+
+
+def team_member_delete_confirm_view(request, member_id):
+    member = get_object_or_404(TeamMember, pk=member_id)
+    return render(
+        request,
+        "aplicator/delete_confirm.html",
+        {
+            "label": member.name,
+            "delete_url": reverse("aplicator:team_member_delete", args=[member.id]),
+        },
+    )
+
+
+def context_block_delete_confirm_view(request, block_id):
+    block = get_object_or_404(CompanyContextBlock, pk=block_id)
+    return render(
+        request,
+        "aplicator/delete_confirm.html",
+        {
+            "label": block.label,
+            "delete_url": reverse("aplicator:context_block_delete", args=[block.id]),
+        },
+    )
 
 
 QuestionFormSet = modelformset_factory(

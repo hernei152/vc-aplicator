@@ -94,3 +94,55 @@ class ContextBlockEditDeleteViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CompanyContextBlock.objects.count(), 0)
+
+
+class TeamMemberDeleteConfirmViewTest(TestCase):
+    def setUp(self):
+        self.member = TeamMember.objects.create(
+            name="Ada Lovelace", role="CTO", bio="Built the algorithm engine for early computers."
+        )
+
+    def test_get_confirm_page_does_not_delete(self):
+        response = self.client.get(
+            reverse("aplicator:team_member_delete_confirm", args=[self.member.id])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Ada Lovelace")
+        self.assertEqual(TeamMember.objects.count(), 1)
+
+    def test_confirm_then_post_deletes(self):
+        self.client.get(reverse("aplicator:team_member_delete_confirm", args=[self.member.id]))
+        response = self.client.post(reverse("aplicator:team_member_delete", args=[self.member.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(TeamMember.objects.count(), 0)
+
+
+class ContextBlockDeleteConfirmViewTest(TestCase):
+    def setUp(self):
+        self.block = CompanyContextBlock.objects.create(label="traction", text="10 pilots.")
+
+    def test_get_confirm_page_does_not_delete(self):
+        response = self.client.get(
+            reverse("aplicator:context_block_delete_confirm", args=[self.block.id])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "traction")
+        self.assertEqual(CompanyContextBlock.objects.count(), 1)
+
+    def test_confirm_then_post_deletes(self):
+        self.client.get(reverse("aplicator:context_block_delete_confirm", args=[self.block.id]))
+        response = self.client.post(
+            reverse("aplicator:context_block_delete", args=[self.block.id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CompanyContextBlock.objects.count(), 0)
+
+
+class TeamMemberListPreviewTest(TestCase):
+    def test_list_shows_bio_preview(self):
+        TeamMember.objects.create(
+            name="Ada Lovelace", role="CTO",
+            bio="Built the algorithm engine for early computers.",
+        )
+        response = self.client.get(reverse("aplicator:context"))
+        self.assertContains(response, "Built the algorithm")

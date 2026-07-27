@@ -1,0 +1,10 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Confirmar borrado</h1>
+<p>¿Confirmás borrar <strong>{{ label }}</strong>?</p>
+<form method="post" action="{{ delete_url }}">
+  {% csrf_token %}
+  <button type="submit">Sí, borrar</button>
+</form>
+<p><a href="{% url 'aplicator:context' %}">Cancelar</a></p>
+{% endblock %}
