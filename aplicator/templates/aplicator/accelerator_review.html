@@ -1,0 +1,12 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Revisar {{ accelerator.accelerator_name }}</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  {% for form in formset %}
+    <fieldset>{{ form.as_p }}</fieldset>
+  {% endfor %}
+  <button type="submit">Guardar</button>
+</form>
+{% endblock %}

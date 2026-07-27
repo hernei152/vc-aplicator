@@ -1,0 +1,19 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Agregar aceleradora</h1>
+<form method="post">
+  {% csrf_token %}
+  <textarea name="raw_text" rows="20" cols="80" placeholder="Pegá el texto del formulario"></textarea>
+  <button type="submit">Extraer</button>
+</form>
+
+<h2>Aceleradoras cargadas</h2>
+<ul>
+  {% for accelerator in accelerators %}
+  <li>
+    {{ accelerator.accelerator_name }}
+    (<a href="{% url 'aplicator:accelerator_review' accelerator.id %}">revisar</a>)
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
