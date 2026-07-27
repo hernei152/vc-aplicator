@@ -10,7 +10,9 @@
   <tr>
     <td>{{ group.category|category_label }}</td>
     <td>{{ group.accelerator_names|join:", " }}</td>
-    <td>{{ group.min_max_chars }}–{{ group.max_max_chars }}</td>
+    <td>
+      {% if group.min_max_chars %}{{ group.min_max_chars }}–{{ group.max_max_chars }}{% else %}sin límite{% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>

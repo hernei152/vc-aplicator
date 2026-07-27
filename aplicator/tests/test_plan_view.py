@@ -28,3 +28,15 @@ class PlanViewTest(TestCase):
         self.assertContains(response, "Problem")
         self.assertContains(response, "founders.inc")
         self.assertContains(response, "Endeavor")
+
+
+class PlanViewNoLimitDisplayTest(TestCase):
+    def test_shows_sin_limite_when_no_question_has_max_chars(self):
+        acc = Accelerator.objects.create(accelerator_name="No Limit Co")
+        Question.objects.create(
+            accelerator=acc, type="text", original_text="What problem?",
+            category=QuestionArchetype.PROBLEM, max_chars=None,
+        )
+        response = self.client.get(reverse("aplicator:plan"))
+        self.assertContains(response, "sin límite")
+        self.assertNotContains(response, "None–None")
