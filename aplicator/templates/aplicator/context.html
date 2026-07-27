@@ -1,0 +1,28 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Contexto de empresa</h1>
+
+<h2>Equipo</h2>
+<ul>
+  {% for member in members %}
+  <li>{{ member.name }} — {{ member.role }}</li>
+  {% endfor %}
+</ul>
+<form method="post">
+  {% csrf_token %}
+  {{ member_form.as_p }}
+  <button type="submit" name="add_member" value="1">Agregar miembro</button>
+</form>
+
+<h2>Bloques de contexto</h2>
+<ul>
+  {% for block in blocks %}
+  <li><strong>{{ block.label }}</strong>: {{ block.text|truncatewords:20 }}</li>
+  {% endfor %}
+</ul>
+<form method="post">
+  {% csrf_token %}
+  {{ block_form.as_p }}
+  <button type="submit" name="add_block" value="1">Agregar bloque</button>
+</form>
+{% endblock %}
