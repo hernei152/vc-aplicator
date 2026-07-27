@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import modelformset_factory
+from django.utils.dateparse import parse_date
 
 from aplicator.models import (
     TeamMember,
@@ -68,11 +69,18 @@ def accelerator_add_view(request):
         raw_text = request.POST.get("raw_text", "")
         llm = get_llm_port()
         extracted = llm.extract_form(raw_text)
-        accelerator = Accelerator.objects.create(
+        # get_or_create guards against the accelerator_name unique constraint:
+        # if extraction yields a name that already exists (including a repeated
+        # "Sin nombre" fallback), we reuse that accelerator instead of crashing
+        # with an IntegrityError, and just append the newly extracted questions
+        # to it for review.
+        accelerator, _created = Accelerator.objects.get_or_create(
             accelerator_name=extracted.get("accelerator_name") or "Sin nombre",
-            url=extracted.get("url") or "",
-            deadline=extracted.get("deadline") or None,
-            raw_text=raw_text,
+            defaults={
+                "url": extracted.get("url") or "",
+                "deadline": parse_date(extracted.get("deadline") or ""),
+                "raw_text": raw_text,
+            },
         )
         for q in extracted.get("questions", []):
             Question.objects.create(

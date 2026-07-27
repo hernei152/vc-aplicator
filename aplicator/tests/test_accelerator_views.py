@@ -60,6 +60,65 @@ class AcceleratorAddViewTest(TestCase):
         mc_question = Question.objects.get(type="multiple_choice", accelerator=accelerator)
         self.assertEqual(mc_question.category, "traction")
 
+    @patch("aplicator.views.get_llm_port")
+    def test_post_with_duplicate_accelerator_name_does_not_crash(self, mock_get_llm_port):
+        existing = Accelerator.objects.create(accelerator_name="founders.inc")
+
+        duplicate_name_extraction = {
+            "accelerator_name": "founders.inc",
+            "url": "https://founders.inc/apply",
+            "deadline": "2026-09-01",
+            "questions": [
+                {
+                    "type": "text",
+                    "original_text": "What problem do you solve?",
+                    "is_required": True,
+                    "category": "problem",
+                    "max_chars": 500,
+                },
+            ],
+        }
+        fake_llm = MagicMock()
+        fake_llm.extract_form.return_value = duplicate_name_extraction
+        mock_get_llm_port.return_value = fake_llm
+
+        response = self.client.post(
+            reverse("aplicator:accelerator_add"), {"raw_text": "pasted text..."}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        # No new Accelerator was created for the colliding name; the existing
+        # one is reused instead of raising IntegrityError.
+        self.assertEqual(
+            Accelerator.objects.filter(accelerator_name="founders.inc").count(), 1
+        )
+        self.assertRedirects(
+            response,
+            reverse("aplicator:accelerator_review", args=[existing.id]),
+        )
+
+    @patch("aplicator.views.get_llm_port")
+    def test_post_with_malformed_deadline_does_not_crash(self, mock_get_llm_port):
+        malformed_deadline_extraction = {
+            "accelerator_name": "Malformed Deadline Accelerator",
+            "url": "https://example.com/apply",
+            "deadline": "sometime next month",
+            "questions": [],
+        }
+        fake_llm = MagicMock()
+        fake_llm.extract_form.return_value = malformed_deadline_extraction
+        mock_get_llm_port.return_value = fake_llm
+
+        response = self.client.post(
+            reverse("aplicator:accelerator_add"), {"raw_text": "pasted text..."}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        accelerator = Accelerator.objects.get(
+            accelerator_name="Malformed Deadline Accelerator"
+        )
+        self.assertIsNone(accelerator.deadline)
+
 
 class AcceleratorReviewViewTest(TestCase):
     def setUp(self):
