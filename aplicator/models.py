@@ -60,7 +60,7 @@ class VideoFocus(models.TextChoices):
 
 
 class Accelerator(models.Model):
-    accelerator_name = models.CharField(max_length=200)
+    accelerator_name = models.CharField(max_length=200, unique=True)
     url = models.URLField(blank=True, default="")
     deadline = models.DateField(null=True, blank=True)
     raw_text = models.TextField(blank=True, default="")

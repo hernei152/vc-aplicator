@@ -19,6 +19,12 @@ class AcceleratorModelTest(TestCase):
         )
         self.assertEqual(str(acc), "founders.inc")
 
+    def test_accelerator_name_unique_constraint(self):
+        Accelerator.objects.create(accelerator_name="Techstars")
+        self.assertEqual(Accelerator.objects.count(), 1)
+        with self.assertRaises(Exception):
+            Accelerator.objects.create(accelerator_name="Techstars")
+
 
 class QuestionModelTest(TestCase):
     def setUp(self):
