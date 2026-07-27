@@ -12,7 +12,8 @@
   {% for accelerator in accelerators %}
   <li>
     {{ accelerator.accelerator_name }}
-    (<a href="{% url 'aplicator:accelerator_review' accelerator.id %}">revisar</a>)
+    (<a href="{% url 'aplicator:accelerator_review' accelerator.id %}">revisar</a> |
+     <a href="{% url 'aplicator:application_answers' accelerator.id %}">respuestas</a>)
   </li>
   {% endfor %}
 </ul>

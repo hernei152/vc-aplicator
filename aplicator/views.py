@@ -1,7 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import modelformset_factory
 
-from aplicator.models import TeamMember, CompanyContextBlock, Accelerator, Question, CanonicalAnswer
+from aplicator.models import (
+    TeamMember,
+    CompanyContextBlock,
+    Accelerator,
+    Question,
+    CanonicalAnswer,
+    GeneratedAnswer,
+    NON_SHAREABLE,
+)
 from aplicator.forms import TeamMemberForm, CompanyContextBlockForm
 from aplicator.llm.factory import get_llm_port
 from aplicator.planner import group_text_questions, group_video_questions, rank_accelerators
@@ -144,3 +152,47 @@ def answer_bank_view(request):
         for group in group_text_questions(questions)
     ]
     return render(request, "aplicator/answer_bank.html", {"rows": rows})
+
+
+def application_answers_view(request, accelerator_id):
+    accelerator = get_object_or_404(Accelerator, pk=accelerator_id)
+
+    if request.method == "POST":
+        question = get_object_or_404(
+            Question, pk=request.POST.get("question_id"), accelerator=accelerator
+        )
+        text = request.POST.get("text", "")
+        if "generate" in request.POST:
+            llm = get_llm_port()
+            if question.category and question.category not in NON_SHAREABLE:
+                canonical = CanonicalAnswer.objects.filter(
+                    category=question.category
+                ).first()
+                context_text = canonical.text if canonical else build_company_context_text()
+            else:
+                context_text = build_company_context_text()
+            text = llm.generate_text(
+                prompt=(
+                    f"Adaptá esta respuesta al wording exacto y al límite de esta "
+                    f"pregunta puntual.\nPregunta original: {question.original_text}\n"
+                    f"Límite de caracteres: {question.max_chars}"
+                ),
+                context=context_text,
+            )
+            if question.max_chars is not None:
+                text = text[: question.max_chars]
+        GeneratedAnswer.objects.update_or_create(question=question, defaults={"text": text})
+        return redirect("aplicator:application_answers", accelerator_id=accelerator.id)
+
+    questions = Question.objects.filter(
+        accelerator=accelerator, type__in=["text", "multiple_choice"]
+    )
+    rows = [
+        {"question": q, "answer": GeneratedAnswer.objects.filter(question=q).first()}
+        for q in questions
+    ]
+    return render(
+        request,
+        "aplicator/application_answers.html",
+        {"accelerator": accelerator, "rows": rows},
+    )
