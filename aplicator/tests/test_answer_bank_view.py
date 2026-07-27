@@ -44,3 +44,31 @@ class AnswerBankViewTest(TestCase):
         fake_llm.generate_text.assert_called_once()
         answer = CanonicalAnswer.objects.get(category="problem")
         self.assertEqual(answer.text, "Generated canonical answer.")
+
+
+class AnswerBankApplicabilityTest(TestCase):
+    def test_shows_accelerator_names_and_no_draft_badge(self):
+        a1 = Accelerator.objects.create(accelerator_name="founders.inc")
+        a2 = Accelerator.objects.create(accelerator_name="Endeavor")
+        Question.objects.create(
+            accelerator=a1, type="text", original_text="What problem?",
+            category=QuestionArchetype.PROBLEM, max_chars=300,
+        )
+        Question.objects.create(
+            accelerator=a2, type="text", original_text="Describe the problem",
+            category=QuestionArchetype.PROBLEM, max_chars=300,
+        )
+        response = self.client.get(reverse("aplicator:answer_bank"))
+        self.assertContains(response, "founders.inc")
+        self.assertContains(response, "Endeavor")
+        self.assertContains(response, "sin borrador")
+
+    def test_shows_draft_saved_badge_when_canonical_exists(self):
+        acc = Accelerator.objects.create(accelerator_name="founders.inc")
+        Question.objects.create(
+            accelerator=acc, type="text", original_text="What problem?",
+            category=QuestionArchetype.PROBLEM, max_chars=300,
+        )
+        CanonicalAnswer.objects.create(category=QuestionArchetype.PROBLEM, text="Draft answer.")
+        response = self.client.get(reverse("aplicator:answer_bank"))
+        self.assertContains(response, "borrador guardado")

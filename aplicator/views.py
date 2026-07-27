@@ -206,7 +206,11 @@ def answer_bank_view(request):
     questions = list(Question.objects.select_related("accelerator").all())
     canonical_by_category = {c.category: c for c in CanonicalAnswer.objects.all()}
     rows = [
-        {"category": group.category, "canonical": canonical_by_category.get(group.category)}
+        {
+            "category": group.category,
+            "canonical": canonical_by_category.get(group.category),
+            "accelerator_names": group.accelerator_names,
+        }
         for group in group_text_questions(questions)
     ]
     return render(request, "aplicator/answer_bank.html", {"rows": rows})

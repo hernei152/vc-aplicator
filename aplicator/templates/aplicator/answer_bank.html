@@ -5,6 +5,10 @@
 {% for row in rows %}
 <fieldset>
   <legend>{{ row.category|category_label }}</legend>
+  <p>
+    Aplica a: {{ row.accelerator_names|join:", " }}
+    — {% if row.canonical %}borrador guardado{% else %}sin borrador{% endif %}
+  </p>
   <form method="post">
     {% csrf_token %}
     <input type="hidden" name="category" value="{{ row.category }}">
