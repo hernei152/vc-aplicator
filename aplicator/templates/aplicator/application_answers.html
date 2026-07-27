@@ -4,6 +4,10 @@
 {% for row in rows %}
 <fieldset>
   <legend>{{ row.question.original_text }} (máx {{ row.question.max_chars }} caracteres)</legend>
+  <p>
+    {{ row.answer_length }}/{{ row.question.max_chars|default:"sin límite" }} caracteres
+    {% if row.possibly_truncated %}— posible truncado por límite{% endif %}
+  </p>
   <form method="post">
     {% csrf_token %}
     <input type="hidden" name="question_id" value="{{ row.question.id }}">

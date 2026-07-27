@@ -233,14 +233,13 @@ def application_answers_view(request, accelerator_id):
                 context_text = canonical.text if canonical else build_company_context_text()
             else:
                 context_text = build_company_context_text()
-            text = llm.generate_text(
-                prompt=(
-                    f"Adaptá esta respuesta al wording exacto y al límite de esta "
-                    f"pregunta puntual.\nPregunta original: {question.original_text}\n"
-                    f"Límite de caracteres: {question.max_chars}"
-                ),
-                context=context_text,
-            )
+            prompt_lines = [
+                "Adaptá esta respuesta al wording exacto y al límite de esta pregunta puntual.",
+                f"Pregunta original: {question.original_text}",
+            ]
+            if question.max_chars is not None:
+                prompt_lines.append(f"Límite de caracteres: {question.max_chars}")
+            text = llm.generate_text(prompt="\n".join(prompt_lines), context=context_text)
             if question.max_chars is not None:
                 text = text[: question.max_chars]
         GeneratedAnswer.objects.update_or_create(question=question, defaults={"text": text})
@@ -249,10 +248,22 @@ def application_answers_view(request, accelerator_id):
     questions = Question.objects.filter(
         accelerator=accelerator, type__in=["text", "multiple_choice"]
     )
-    rows = [
-        {"question": q, "answer": GeneratedAnswer.objects.filter(question=q).first()}
-        for q in questions
-    ]
+    rows = []
+    for q in questions:
+        answer = GeneratedAnswer.objects.filter(question=q).first()
+        answer_length = len(answer.text) if answer else 0
+        rows.append(
+            {
+                "question": q,
+                "answer": answer,
+                "answer_length": answer_length,
+                "possibly_truncated": (
+                    answer is not None
+                    and q.max_chars is not None
+                    and answer_length == q.max_chars
+                ),
+            }
+        )
     return render(
         request,
         "aplicator/application_answers.html",
