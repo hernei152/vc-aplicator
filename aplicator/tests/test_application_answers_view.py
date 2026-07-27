@@ -100,6 +100,19 @@ class ApplicationAnswersCharCountTest(TestCase):
         self.assertContains(response, "13/500")
         self.assertNotContains(response, "posible truncado")
 
+    def test_max_chars_zero_not_rendered_as_no_limit(self):
+        question = Question.objects.create(
+            accelerator=self.accelerator, type="text",
+            original_text="What problem?", category=QuestionArchetype.PROBLEM,
+            max_chars=0,
+        )
+        GeneratedAnswer.objects.create(question=question, text="")
+        response = self.client.get(
+            reverse("aplicator:application_answers", args=[self.accelerator.id])
+        )
+        self.assertContains(response, "0/0")
+        self.assertNotContains(response, "sin límite")
+
 
 class ApplicationAnswersPromptTest(TestCase):
     @patch("aplicator.views.get_llm_port")

@@ -5,7 +5,7 @@
 <fieldset>
   <legend>{{ row.question.original_text }} (máx {{ row.question.max_chars }} caracteres)</legend>
   <p>
-    {{ row.answer_length }}/{{ row.question.max_chars|default:"sin límite" }} caracteres
+    {{ row.answer_length }}/{{ row.question.max_chars|default_if_none:"sin límite" }} caracteres
     {% if row.possibly_truncated %}— posible truncado por límite{% endif %}
   </p>
   <form method="post">
