@@ -1,9 +1,10 @@
 {% extends "aplicator/base.html" %}
+{% load aplicator_extras %}
 {% block content %}
 <h1>Answer bank</h1>
 {% for row in rows %}
 <fieldset>
-  <legend>{{ row.category }}</legend>
+  <legend>{{ row.category|category_label }}</legend>
   <form method="post">
     {% csrf_token %}
     <input type="hidden" name="category" value="{{ row.category }}">

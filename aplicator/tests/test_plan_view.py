@@ -25,6 +25,6 @@ class PlanViewTest(TestCase):
         response = self.client.get(reverse("aplicator:plan"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "problem")
+        self.assertContains(response, "Problem")
         self.assertContains(response, "founders.inc")
         self.assertContains(response, "Endeavor")

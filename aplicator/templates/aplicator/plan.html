@@ -1,4 +1,5 @@
 {% extends "aplicator/base.html" %}
+{% load aplicator_extras %}
 {% block content %}
 <h1>Plan</h1>
 
@@ -7,7 +8,7 @@
   <tr><th>Categoría</th><th>Aplicaciones</th><th>Límite (min–max chars)</th></tr>
   {% for group in text_groups %}
   <tr>
-    <td>{{ group.category }}</td>
+    <td>{{ group.category|category_label }}</td>
     <td>{{ group.accelerator_names|join:", " }}</td>
     <td>{{ group.min_max_chars }}–{{ group.max_max_chars }}</td>
   </tr>
@@ -19,7 +20,7 @@
   <tr><th>Focus</th><th>Orientación</th><th>Idioma</th><th>Quién</th><th>Grabar (seg)</th><th>Master</th><th>Cortes derivados</th></tr>
   {% for rec in recordings %}
   <tr>
-    <td>{{ rec.focus }}</td>
+    <td>{{ rec.focus|focus_label }}</td>
     <td>{{ rec.orientation }}</td>
     <td>{{ rec.language }}</td>
     <td>{{ rec.who }}</td>
