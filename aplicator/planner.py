@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass, field
 
 from aplicator.models import NON_SHAREABLE
@@ -117,3 +118,36 @@ def group_video_questions(questions):
                 )
             )
     return recordings
+
+
+def rank_accelerators(accelerators, questions):
+    accelerators = list(accelerators)
+    questions = list(questions)
+    text_groups = group_text_questions(questions)
+    recordings = group_video_questions(questions)
+
+    def exclusive_count(acc):
+        count = sum(
+            1
+            for q in questions
+            if q.accelerator_id == acc.id
+            and q.type in ("text", "multiple_choice")
+            and q.category in NON_SHAREABLE
+        )
+        for group in text_groups:
+            if group.accelerator_names == [acc.accelerator_name]:
+                count += 1
+        for rec in recordings:
+            covered = [rec.master_question, *rec.derived_cut_questions]
+            names = {q.accelerator.accelerator_name for q in covered}
+            if names == {acc.accelerator_name}:
+                count += 1
+        return count
+
+    return sorted(
+        accelerators,
+        key=lambda acc: (
+            exclusive_count(acc),
+            acc.deadline or datetime.date.max,
+        ),
+    )

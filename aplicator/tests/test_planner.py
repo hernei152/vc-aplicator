@@ -1,6 +1,7 @@
+import datetime
 from django.test import TestCase
 from aplicator.models import Accelerator, Question, QuestionArchetype
-from aplicator.planner import group_text_questions, group_video_questions
+from aplicator.planner import group_text_questions, group_video_questions, rank_accelerators
 
 
 class GroupTextQuestionsTest(TestCase):
@@ -116,3 +117,83 @@ class GroupVideoQuestionsTest(TestCase):
         # The recording must be long enough to cover the bounded video's minimum.
         # Without the fix, this would fail because record_seconds would be 5 (unbounded.min_seconds).
         self.assertGreaterEqual(rec.record_seconds, 90)
+
+
+class RankAcceleratorsTest(TestCase):
+    def test_ranks_by_exclusive_count_then_deadline(self):
+        cheap = Accelerator.objects.create(
+            accelerator_name="cheap", deadline=datetime.date(2026, 12, 1)
+        )
+        expensive = Accelerator.objects.create(
+            accelerator_name="expensive", deadline=datetime.date(2026, 8, 1)
+        )
+        # shared category: costs nothing extra for either
+        Question.objects.create(
+            accelerator=cheap,
+            type="text",
+            original_text="problem?",
+            category=QuestionArchetype.PROBLEM,
+            max_chars=300,
+        )
+        Question.objects.create(
+            accelerator=expensive,
+            type="text",
+            original_text="problem?",
+            category=QuestionArchetype.PROBLEM,
+            max_chars=300,
+        )
+        # exclusive, non-shareable question, only on "expensive"
+        Question.objects.create(
+            accelerator=expensive,
+            type="text",
+            original_text="Why this program?",
+            category=QuestionArchetype.WHY_THIS_PROGRAM,
+            max_chars=200,
+        )
+        questions = Question.objects.select_related("accelerator").all()
+        ranked = rank_accelerators([cheap, expensive], questions)
+        self.assertEqual([a.accelerator_name for a in ranked], ["cheap", "expensive"])
+
+    def test_deadline_tiebreak_when_exclusive_count_equal(self):
+        earlier = Accelerator.objects.create(
+            accelerator_name="earlier", deadline=datetime.date(2026, 8, 1)
+        )
+        later = Accelerator.objects.create(
+            accelerator_name="later", deadline=datetime.date(2026, 12, 1)
+        )
+        ranked = rank_accelerators([later, earlier], [])
+        self.assertEqual([a.accelerator_name for a in ranked], ["earlier", "later"])
+
+    def test_exclusive_video_recording_counts_against_owner(self):
+        solo = Accelerator.objects.create(accelerator_name="solo")
+        shared_a = Accelerator.objects.create(accelerator_name="shared_a")
+        shared_b = Accelerator.objects.create(accelerator_name="shared_b")
+        Question.objects.create(
+            accelerator=solo,
+            type="video",
+            original_text="pitch",
+            focus="pitch",
+            min_seconds=60,
+            max_seconds=90,
+        )
+        Question.objects.create(
+            accelerator=shared_a,
+            type="video",
+            original_text="pitch",
+            focus="demo",
+            min_seconds=60,
+            max_seconds=90,
+        )
+        Question.objects.create(
+            accelerator=shared_b,
+            type="video",
+            original_text="pitch",
+            focus="demo",
+            min_seconds=60,
+            max_seconds=90,
+        )
+        questions = Question.objects.select_related("accelerator").all()
+        ranked = rank_accelerators([solo, shared_a, shared_b], questions)
+        self.assertEqual(ranked[0].accelerator_name, "shared_a")
+        self.assertEqual(ranked[1].accelerator_name, "shared_b")
+        self.assertEqual(ranked[2].accelerator_name, "solo")
