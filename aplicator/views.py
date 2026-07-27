@@ -43,6 +43,50 @@ def context_view(request):
     )
 
 
+def team_member_edit_view(request, member_id):
+    member = get_object_or_404(TeamMember, pk=member_id)
+    if request.method == "POST":
+        form = TeamMemberForm(request.POST, instance=member)
+        if form.is_valid():
+            form.save()
+            return redirect("aplicator:context")
+    else:
+        form = TeamMemberForm(instance=member)
+    return render(
+        request,
+        "aplicator/edit_form.html",
+        {"form": form, "title": f"Editar miembro: {member.name}"},
+    )
+
+
+def team_member_delete_view(request, member_id):
+    if request.method == "POST":
+        TeamMember.objects.filter(pk=member_id).delete()
+    return redirect("aplicator:context")
+
+
+def context_block_edit_view(request, block_id):
+    block = get_object_or_404(CompanyContextBlock, pk=block_id)
+    if request.method == "POST":
+        form = CompanyContextBlockForm(request.POST, instance=block)
+        if form.is_valid():
+            form.save()
+            return redirect("aplicator:context")
+    else:
+        form = CompanyContextBlockForm(instance=block)
+    return render(
+        request,
+        "aplicator/edit_form.html",
+        {"form": form, "title": f"Editar bloque: {block.label}"},
+    )
+
+
+def context_block_delete_view(request, block_id):
+    if request.method == "POST":
+        CompanyContextBlock.objects.filter(pk=block_id).delete()
+    return redirect("aplicator:context")
+
+
 QuestionFormSet = modelformset_factory(
     Question,
     fields=[

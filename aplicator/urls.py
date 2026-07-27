@@ -6,6 +6,26 @@ app_name = "aplicator"
 
 urlpatterns = [
     path("", views.context_view, name="context"),
+    path(
+        "context/member/<int:member_id>/edit/",
+        views.team_member_edit_view,
+        name="team_member_edit",
+    ),
+    path(
+        "context/member/<int:member_id>/delete/",
+        views.team_member_delete_view,
+        name="team_member_delete",
+    ),
+    path(
+        "context/block/<int:block_id>/edit/",
+        views.context_block_edit_view,
+        name="context_block_edit",
+    ),
+    path(
+        "context/block/<int:block_id>/delete/",
+        views.context_block_delete_view,
+        name="context_block_delete",
+    ),
     path("accelerators/add/", views.accelerator_add_view, name="accelerator_add"),
     path(
         "accelerators/<int:accelerator_id>/review/",

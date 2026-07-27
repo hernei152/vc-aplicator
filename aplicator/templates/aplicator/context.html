@@ -5,7 +5,14 @@
 <h2>Equipo</h2>
 <ul>
   {% for member in members %}
-  <li>{{ member.name }} — {{ member.role }}</li>
+  <li>
+    {{ member.name }} — {{ member.role }}
+    (<a href="{% url 'aplicator:team_member_edit' member.id %}">editar</a> |
+    <form method="post" action="{% url 'aplicator:team_member_delete' member.id %}" style="display:inline">
+      {% csrf_token %}
+      <button type="submit">borrar</button>
+    </form>)
+  </li>
   {% endfor %}
 </ul>
 <form method="post">
@@ -17,7 +24,14 @@
 <h2>Bloques de contexto</h2>
 <ul>
   {% for block in blocks %}
-  <li><strong>{{ block.label }}</strong>: {{ block.text|truncatewords:20 }}</li>
+  <li>
+    <strong>{{ block.label }}</strong>: {{ block.text|truncatewords:20 }}
+    (<a href="{% url 'aplicator:context_block_edit' block.id %}">editar</a> |
+    <form method="post" action="{% url 'aplicator:context_block_delete' block.id %}" style="display:inline">
+      {% csrf_token %}
+      <button type="submit">borrar</button>
+    </form>)
+  </li>
   {% endfor %}
 </ul>
 <form method="post">
