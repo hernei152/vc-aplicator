@@ -17,6 +17,14 @@ FAKE_EXTRACTION = {
             "max_chars": 500,
         },
         {
+            "type": "multiple_choice",
+            "original_text": "What stage is your company at?",
+            "is_required": True,
+            "archetype": "traction",
+            "options": ["Idea", "MVP", "Revenue"],
+            "allow_multiple": False,
+        },
+        {
             "type": "video",
             "original_text": "Record a pitch",
             "is_required": True,
@@ -47,7 +55,10 @@ class AcceleratorAddViewTest(TestCase):
             response,
             reverse("aplicator:accelerator_review", args=[accelerator.id]),
         )
-        self.assertEqual(Question.objects.filter(accelerator=accelerator).count(), 2)
+        self.assertEqual(Question.objects.filter(accelerator=accelerator).count(), 3)
+        # Verify that multiple_choice question has archetype correctly mapped to category
+        mc_question = Question.objects.get(type="multiple_choice", accelerator=accelerator)
+        self.assertEqual(mc_question.category, "traction")
 
 
 class AcceleratorReviewViewTest(TestCase):
@@ -60,6 +71,13 @@ class AcceleratorReviewViewTest(TestCase):
             category="problem",
             max_chars=500,
         )
+        self.mc_question = Question.objects.create(
+            accelerator=self.accelerator,
+            type="multiple_choice",
+            original_text="What stage?",
+            category="traction",
+            options=["Idea", "MVP", "Revenue"],
+        )
 
     def test_get_renders_formset(self):
         response = self.client.get(
@@ -69,8 +87,8 @@ class AcceleratorReviewViewTest(TestCase):
 
     def test_post_saves_edits(self):
         management_data = {
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "1",
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "2",
             "form-MIN_NUM_FORMS": "0",
             "form-MAX_NUM_FORMS": "1000",
             "form-0-id": str(self.question.id),
@@ -87,6 +105,20 @@ class AcceleratorReviewViewTest(TestCase):
             "form-0-orientation": "any",
             "form-0-language": "any",
             "form-0-who": "any",
+            "form-1-id": str(self.mc_question.id),
+            "form-1-type": "multiple_choice",
+            "form-1-original_text": "What stage?",
+            "form-1-is_required": "on",
+            "form-1-category": "traction",
+            "form-1-max_chars": "",
+            "form-1-options": '["Idea", "MVP", "Revenue"]',
+            "form-1-allow_multiple": "",
+            "form-1-focus": "",
+            "form-1-min_seconds": "",
+            "form-1-max_seconds": "",
+            "form-1-orientation": "any",
+            "form-1-language": "any",
+            "form-1-who": "any",
         }
         response = self.client.post(
             reverse("aplicator:accelerator_review", args=[self.accelerator.id]),
@@ -95,3 +127,5 @@ class AcceleratorReviewViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.question.refresh_from_db()
         self.assertEqual(self.question.category, "solution")
+        self.mc_question.refresh_from_db()
+        self.assertEqual(self.mc_question.category, "traction")

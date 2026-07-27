@@ -70,7 +70,7 @@ def accelerator_add_view(request):
                 type=q.get("type"),
                 original_text=q.get("original_text", ""),
                 is_required=q.get("is_required", True),
-                category=q.get("category"),
+                category=q.get("category") or q.get("archetype"),
                 max_chars=q.get("max_chars"),
                 options=q.get("options") or [],
                 allow_multiple=q.get("allow_multiple", False),
