@@ -13,4 +13,5 @@ urlpatterns = [
         name="accelerator_review",
     ),
     path("plan/", views.plan_view, name="plan"),
+    path("answer-bank/", views.answer_bank_view, name="answer_bank"),
 ]

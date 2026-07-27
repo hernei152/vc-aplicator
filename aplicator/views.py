@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import modelformset_factory
 
-from aplicator.models import TeamMember, CompanyContextBlock, Accelerator, Question
+from aplicator.models import TeamMember, CompanyContextBlock, Accelerator, Question, CanonicalAnswer
 from aplicator.forms import TeamMemberForm, CompanyContextBlockForm
 from aplicator.llm.factory import get_llm_port
 from aplicator.planner import group_text_questions, group_video_questions, rank_accelerators
+from aplicator.company_context import build_company_context_text
 
 
 def context_view(request):
@@ -119,3 +120,27 @@ def plan_view(request):
             "ranked_accelerators": rank_accelerators(accelerators, questions),
         },
     )
+
+
+def answer_bank_view(request):
+    if request.method == "POST":
+        category = request.POST.get("category")
+        text = request.POST.get("text", "")
+        if "generate" in request.POST:
+            llm = get_llm_port()
+            text = llm.generate_text(
+                prompt=f"Escribí la respuesta canónica larga para la categoría '{category}'.",
+                context=build_company_context_text(),
+            )
+        CanonicalAnswer.objects.update_or_create(
+            category=category, defaults={"text": text}
+        )
+        return redirect("aplicator:answer_bank")
+
+    questions = list(Question.objects.select_related("accelerator").all())
+    canonical_by_category = {c.category: c for c in CanonicalAnswer.objects.all()}
+    rows = [
+        {"category": group.category, "canonical": canonical_by_category.get(group.category)}
+        for group in group_text_questions(questions)
+    ]
+    return render(request, "aplicator/answer_bank.html", {"rows": rows})

@@ -1,0 +1,17 @@
+{% extends "aplicator/base.html" %}
+{% block content %}
+<h1>Answer bank</h1>
+{% for row in rows %}
+<fieldset>
+  <legend>{{ row.category }}</legend>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="category" value="{{ row.category }}">
+    <textarea name="text" rows="6" cols="80">{{ row.canonical.text|default:"" }}</textarea>
+    <br>
+    <button type="submit" name="save" value="1">Guardar</button>
+    <button type="submit" name="generate" value="1">Generar</button>
+  </form>
+</fieldset>
+{% endfor %}
+{% endblock %}
