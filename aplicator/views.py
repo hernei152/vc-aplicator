@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import modelformset_factory
 from django.utils.dateparse import parse_date
+from django.contrib import messages
 
 from aplicator.models import (
     TeamMember,
@@ -143,6 +144,11 @@ def accelerator_add_view(request):
                 language=q.get("language") or "any",
                 who=q.get("who") or "any",
             )
+        question_count = len(extracted.get("questions", []))
+        messages.info(
+            request,
+            f"Se extrajeron {question_count} preguntas — revisalas antes de continuar.",
+        )
         return redirect("aplicator:accelerator_review", accelerator_id=accelerator.id)
     return render(
         request,

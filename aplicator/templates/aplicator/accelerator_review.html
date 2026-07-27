@@ -5,7 +5,34 @@
   {% csrf_token %}
   {{ formset.management_form }}
   {% for form in formset %}
-    <fieldset>{{ form.as_p }}</fieldset>
+    <fieldset>
+      <legend>{{ form.instance.get_type_display }}</legend>
+      {{ form.id }}
+      {{ form.type.as_hidden }}
+      {{ form.original_text.as_field_group }}
+      {{ form.is_required.as_field_group }}
+      {% if form.instance.type == "text" %}
+        {{ form.category.as_field_group }}
+        {{ form.max_chars.as_field_group }}
+        {{ form.orientation.as_hidden }}
+        {{ form.language.as_hidden }}
+        {{ form.who.as_hidden }}
+      {% elif form.instance.type == "multiple_choice" %}
+        {{ form.category.as_field_group }}
+        {{ form.options.as_field_group }}
+        {{ form.allow_multiple.as_field_group }}
+        {{ form.orientation.as_hidden }}
+        {{ form.language.as_hidden }}
+        {{ form.who.as_hidden }}
+      {% elif form.instance.type == "video" %}
+        {{ form.focus.as_field_group }}
+        {{ form.min_seconds.as_field_group }}
+        {{ form.max_seconds.as_field_group }}
+        {{ form.orientation.as_field_group }}
+        {{ form.language.as_field_group }}
+        {{ form.who.as_field_group }}
+      {% endif %}
+    </fieldset>
   {% endfor %}
   <button type="submit">Guardar</button>
 </form>

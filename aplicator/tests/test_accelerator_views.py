@@ -188,3 +188,95 @@ class AcceleratorReviewViewTest(TestCase):
         self.assertEqual(self.question.category, "solution")
         self.mc_question.refresh_from_db()
         self.assertEqual(self.mc_question.category, "traction")
+
+
+class AcceleratorReviewFieldRelevanceTest(TestCase):
+    def setUp(self):
+        self.accelerator = Accelerator.objects.create(accelerator_name="Field Relevance Co")
+        self.text_q = Question.objects.create(
+            accelerator=self.accelerator,
+            type="text",
+            original_text="What problem?",
+            category="problem",
+            max_chars=200,
+        )
+        self.video_q = Question.objects.create(
+            accelerator=self.accelerator,
+            type="video",
+            original_text="Record a pitch",
+            focus="pitch",
+            min_seconds=60,
+            max_seconds=90,
+        )
+
+    def test_text_question_does_not_render_video_only_fields(self):
+        response = self.client.get(
+            reverse("aplicator:accelerator_review", args=[self.accelerator.id])
+        )
+        content = response.content.decode()
+        self.assertNotIn('name="form-0-focus"', content)
+        self.assertNotIn('name="form-0-min_seconds"', content)
+        self.assertNotIn('name="form-0-max_seconds"', content)
+
+    def test_video_question_does_not_render_text_only_fields(self):
+        response = self.client.get(
+            reverse("aplicator:accelerator_review", args=[self.accelerator.id])
+        )
+        content = response.content.decode()
+        self.assertNotIn('name="form-1-category"', content)
+        self.assertNotIn('name="form-1-max_chars"', content)
+        self.assertNotIn('name="form-1-options"', content)
+
+    def test_mixed_types_save_successfully(self):
+        management_data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "2",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+            "form-0-id": str(self.text_q.id),
+            "form-0-type": "text",
+            "form-0-original_text": "What problem?",
+            "form-0-category": "solution",
+            "form-0-max_chars": "200",
+            "form-0-options": "[]",
+            "form-0-orientation": "any",
+            "form-0-language": "any",
+            "form-0-who": "any",
+            "form-1-id": str(self.video_q.id),
+            "form-1-type": "video",
+            "form-1-original_text": "Record a pitch",
+            "form-1-focus": "pitch",
+            "form-1-min_seconds": "60",
+            "form-1-max_seconds": "90",
+            "form-1-orientation": "h",
+            "form-1-language": "en",
+            "form-1-who": "solo",
+            "form-1-options": "[]",
+        }
+        response = self.client.post(
+            reverse("aplicator:accelerator_review", args=[self.accelerator.id]),
+            management_data,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.text_q.refresh_from_db()
+        self.assertEqual(self.text_q.category, "solution")
+
+
+class AcceleratorAddFlashMessageTest(TestCase):
+    @patch("aplicator.views.get_llm_port")
+    def test_extraction_shows_flash_message_with_question_count(self, mock_get_llm_port):
+        fake_llm = MagicMock()
+        fake_llm.extract_form.return_value = {
+            "accelerator_name": "Flash Co",
+            "questions": [
+                {"type": "text", "original_text": "Q1", "category": "problem"},
+                {"type": "text", "original_text": "Q2", "category": "solution"},
+            ],
+        }
+        mock_get_llm_port.return_value = fake_llm
+        response = self.client.post(
+            reverse("aplicator:accelerator_add"), {"raw_text": "..."}, follow=True
+        )
+        messages = list(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertIn("2", str(messages[0]))
