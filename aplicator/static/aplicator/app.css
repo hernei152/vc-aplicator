@@ -44,6 +44,20 @@ fieldset > legend {
   width: 100%;
 }
 
+/* Inline row actions sit next to each other and one of them deletes, so give
+   them a real touch target instead of a 27px text hitbox. */
+.row-actions {
+  display: inline-flex;
+  gap: calc(var(--pico-spacing) * 0.5);
+  margin-left: calc(var(--pico-spacing) * 0.25);
+}
+.row-actions > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 calc(var(--pico-spacing) * 0.5);
+}
+
 /* Wide tables scroll inside their own box so the page body never scrolls
    sideways on a phone. */
 .table-scroll {

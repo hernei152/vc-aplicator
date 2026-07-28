@@ -11,8 +11,10 @@
     {% if member.bio or member.track_record %}
     <br><small>{{ member.bio|default:member.track_record|truncatewords:15 }}</small>
     {% endif %}
-    (<a href="{% url 'aplicator:team_member_edit' member.id %}">editar</a> |
-    <a href="{% url 'aplicator:team_member_delete_confirm' member.id %}" class="danger">borrar</a>)
+    <span class="row-actions">
+      <a href="{% url 'aplicator:team_member_edit' member.id %}">editar</a>
+      <a href="{% url 'aplicator:team_member_delete_confirm' member.id %}" class="danger">borrar</a>
+    </span>
   </li>
   {% endfor %}
 </ul>
@@ -28,8 +30,10 @@
   {% for block in blocks %}
   <li>
     <strong>{{ block.label }}</strong>: {{ block.text|truncatewords:20 }}
-    (<a href="{% url 'aplicator:context_block_edit' block.id %}">editar</a> |
-    <a href="{% url 'aplicator:context_block_delete_confirm' block.id %}" class="danger">borrar</a>)
+    <span class="row-actions">
+      <a href="{% url 'aplicator:context_block_edit' block.id %}">editar</a>
+      <a href="{% url 'aplicator:context_block_delete_confirm' block.id %}" class="danger">borrar</a>
+    </span>
   </li>
   {% endfor %}
 </ul>
