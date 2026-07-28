@@ -8,12 +8,19 @@
   <link rel="stylesheet" href="{% static 'aplicator/pico.min.css' %}">
 </head>
 <body>
-  <nav>
-    <a href="{% url 'aplicator:context' %}">Contexto</a>
-    <a href="{% url 'aplicator:accelerator_add' %}">Aceleradoras</a>
-    <a href="{% url 'aplicator:plan' %}">Plan</a>
-    <a href="{% url 'aplicator:answer_bank' %}">Answer bank</a>
+  {% with active=request.resolver_match.url_name %}
+  <nav class="container">
+    <ul>
+      <li><a href="{% url 'aplicator:context' %}"><strong>accel</strong></a></li>
+    </ul>
+    <ul>
+      <li><a href="{% url 'aplicator:context' %}" {% if active == 'context' %}aria-current="page"{% endif %}>Contexto</a></li>
+      <li><a href="{% url 'aplicator:accelerator_add' %}" {% if active == 'accelerator_add' %}aria-current="page"{% endif %}>Aceleradoras</a></li>
+      <li><a href="{% url 'aplicator:plan' %}" {% if active == 'plan' %}aria-current="page"{% endif %}>Plan</a></li>
+      <li><a href="{% url 'aplicator:answer_bank' %}" {% if active == 'answer_bank' %}aria-current="page"{% endif %}>Respuestas base</a></li>
+    </ul>
   </nav>
+  {% endwith %}
   {% if messages %}
     {% for message in messages %}
       <article>{{ message }}</article>
