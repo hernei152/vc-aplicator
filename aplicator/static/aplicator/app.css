@@ -1,0 +1,16 @@
+/* Project layer on top of Pico. Only tokens Pico does not ship. */
+
+/* Destructive actions must never look like save actions.
+   Selector needs the element to outrank Pico's own [type=submit] rule. */
+button.danger,
+[type="submit"].danger {
+  --pico-background-color: var(--pico-del-color);
+  --pico-border-color: var(--pico-del-color);
+  --pico-color: #fff;
+}
+a.danger {
+  --pico-color: var(--pico-del-color);
+  --pico-underline: var(--pico-del-color);
+  background: none;
+  border: none;
+}

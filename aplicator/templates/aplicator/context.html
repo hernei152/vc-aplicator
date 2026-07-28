@@ -11,7 +11,7 @@
     <br><small>{{ member.bio|default:member.track_record|truncatewords:15 }}</small>
     {% endif %}
     (<a href="{% url 'aplicator:team_member_edit' member.id %}">editar</a> |
-    <a href="{% url 'aplicator:team_member_delete_confirm' member.id %}">borrar</a>)
+    <a href="{% url 'aplicator:team_member_delete_confirm' member.id %}" class="danger">borrar</a>)
   </li>
   {% endfor %}
 </ul>
@@ -27,7 +27,7 @@
   <li>
     <strong>{{ block.label }}</strong>: {{ block.text|truncatewords:20 }}
     (<a href="{% url 'aplicator:context_block_edit' block.id %}">editar</a> |
-    <a href="{% url 'aplicator:context_block_delete_confirm' block.id %}">borrar</a>)
+    <a href="{% url 'aplicator:context_block_delete_confirm' block.id %}" class="danger">borrar</a>)
   </li>
   {% endfor %}
 </ul>
