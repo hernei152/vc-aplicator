@@ -3,7 +3,8 @@
 <h1>Agregar aceleradora</h1>
 <form method="post">
   {% csrf_token %}
-  <textarea name="raw_text" rows="20" cols="80" placeholder="Pegá el texto del formulario"></textarea>
+  <label for="raw_text">Texto del formulario de la aceleradora</label>
+  <textarea id="raw_text" name="raw_text" rows="20" placeholder="Pegá acá el texto del formulario"></textarea>
   <button type="submit">Extraer</button>
 </form>
 
