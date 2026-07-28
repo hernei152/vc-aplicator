@@ -15,6 +15,17 @@ a.danger {
   border: none;
 }
 
+/* Fieldset legends are the real section headings on the answer pages.
+   Pico renders them at body size/weight, so nothing is scannable. */
+fieldset > legend {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  padding-top: var(--pico-spacing);
+  border-top: 1px solid var(--pico-muted-border-color);
+  width: 100%;
+}
+
 /* Action rows: primary and secondary side by side, sized to their label
    instead of two identical full-width bars stacked vertically. */
 .actions {
