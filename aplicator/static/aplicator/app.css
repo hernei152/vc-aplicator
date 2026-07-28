@@ -14,3 +14,17 @@ a.danger {
   background: none;
   border: none;
 }
+
+/* Action rows: primary and secondary side by side, sized to their label
+   instead of two identical full-width bars stacked vertically. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pico-spacing);
+  margin-bottom: var(--pico-spacing);
+}
+.actions > button,
+.actions > button[type="submit"] {
+  width: auto;
+  margin-bottom: 0;
+}

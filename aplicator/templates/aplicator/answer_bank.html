@@ -12,10 +12,11 @@
   <form method="post">
     {% csrf_token %}
     <input type="hidden" name="category" value="{{ row.category }}">
-    <textarea name="text" rows="6" cols="80">{{ row.canonical.text|default:"" }}</textarea>
-    <br>
-    <button type="submit" name="save" value="1">Guardar</button>
-    <button type="submit" name="generate" value="1">Generar</button>
+    <textarea name="text" rows="6">{{ row.canonical.text|default:"" }}</textarea>
+    <div class="actions">
+      <button type="submit" name="save" value="1">Guardar</button>
+      <button type="submit" name="generate" value="1" class="secondary outline">Generar con IA</button>
+    </div>
   </form>
 </fieldset>
 {% endfor %}
