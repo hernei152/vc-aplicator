@@ -17,6 +17,7 @@
 </ul>
 <form method="post">
   {% csrf_token %}
+  <h3>Agregar miembro</h3>
   {{ member_form.as_p }}
   <button type="submit" name="add_member" value="1">Agregar miembro</button>
 </form>
@@ -33,6 +34,7 @@
 </ul>
 <form method="post">
   {% csrf_token %}
+  <h3>Agregar bloque</h3>
   {{ block_form.as_p }}
   <button type="submit" name="add_block" value="1">Agregar bloque</button>
 </form>
