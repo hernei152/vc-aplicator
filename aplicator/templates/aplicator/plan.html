@@ -5,8 +5,15 @@
 <h1>Plan</h1>
 
 <h2>Qué respondo una sola vez</h2>
+{% if not text_groups %}
+  <p>Todavía no hay preguntas de texto. Cargá una aceleradora para empezar.</p>
+{% else %}
+<div class="table-scroll">
 <table>
-  <tr><th>Categoría</th><th>Aplicaciones</th><th>Límite (min–max chars)</th></tr>
+  <thead>
+  <tr><th scope="col">Categoría</th><th scope="col">Aplicaciones</th><th scope="col">Límite (min–max chars)</th></tr>
+  </thead>
+  <tbody>
   {% for group in text_groups %}
   <tr>
     <td>{{ group.category|category_label }}</td>
@@ -16,11 +23,21 @@
     </td>
   </tr>
   {% endfor %}
+  </tbody>
 </table>
+</div>
+{% endif %}
 
 <h2>Qué produzco una sola vez (video)</h2>
+{% if not recordings %}
+  <p>Ninguna aceleradora cargada pide video todavía.</p>
+{% else %}
+<div class="table-scroll">
 <table>
-  <tr><th>Focus</th><th>Orientación</th><th>Idioma</th><th>Quién</th><th>Grabar (seg)</th><th>Master</th><th>Cortes derivados</th></tr>
+  <thead>
+  <tr><th scope="col">Focus</th><th scope="col">Orientación</th><th scope="col">Idioma</th><th scope="col">Quién</th><th scope="col">Grabar (seg)</th><th scope="col">Master</th><th scope="col">Cortes derivados</th></tr>
+  </thead>
+  <tbody>
   {% for rec in recordings %}
   <tr>
     <td>{{ rec.focus|focus_label }}</td>
@@ -36,12 +53,19 @@
     </td>
   </tr>
   {% endfor %}
+  </tbody>
 </table>
+</div>
+{% endif %}
 
 <h2>Costo marginal (menor a mayor esfuerzo exclusivo)</h2>
+{% if not ranked_accelerators %}
+  <p>Sin aceleradoras cargadas.</p>
+{% else %}
 <ol>
   {% for accelerator in ranked_accelerators %}
   <li>{{ accelerator.accelerator_name }} — deadline: {{ accelerator.deadline|default:"sin fecha" }}</li>
   {% endfor %}
 </ol>
+{% endif %}
 {% endblock %}

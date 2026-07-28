@@ -44,6 +44,12 @@ fieldset > legend {
   width: 100%;
 }
 
+/* Wide tables scroll inside their own box so the page body never scrolls
+   sideways on a phone. */
+.table-scroll {
+  overflow-x: auto;
+}
+
 /* The review page runs 30+ questions long. Keep Guardar reachable instead of
    making people scroll the whole form to find the one submit button. */
 .sticky-actions {
