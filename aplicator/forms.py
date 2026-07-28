@@ -14,6 +14,11 @@ class TeamMemberForm(forms.ModelForm):
             "track_record": "Trayectoria",
             "notable_projects": "Proyectos destacados",
         }
+        widgets = {
+            "bio": forms.Textarea(attrs={"rows": 3}),
+            "track_record": forms.Textarea(attrs={"rows": 3}),
+            "notable_projects": forms.Textarea(attrs={"rows": 3}),
+        }
 
 
 class CompanyContextBlockForm(forms.ModelForm):
@@ -23,4 +28,7 @@ class CompanyContextBlockForm(forms.ModelForm):
         labels = {
             "label": "Etiqueta",
             "text": "Texto",
+        }
+        widgets = {
+            "text": forms.Textarea(attrs={"rows": 4}),
         }
