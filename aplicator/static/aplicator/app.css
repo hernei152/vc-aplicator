@@ -78,7 +78,8 @@ fieldset > legend {
   margin-bottom: var(--pico-spacing);
 }
 .actions > button,
-.actions > button[type="submit"] {
+.actions > button[type="submit"],
+.actions > [role="button"] {
   width: auto;
   margin-bottom: 0;
 }

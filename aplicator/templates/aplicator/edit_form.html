@@ -5,6 +5,9 @@
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Guardar</button>
+  <div class="actions">
+    <button type="submit">Guardar</button>
+    <a href="{% url 'aplicator:context' %}" role="button" class="secondary outline">Cancelar</a>
+  </div>
 </form>
 {% endblock %}
