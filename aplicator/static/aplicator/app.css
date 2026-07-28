@@ -44,6 +44,25 @@ fieldset > legend {
   width: 100%;
 }
 
+/* The review page runs 30+ questions long. Keep Guardar reachable instead of
+   making people scroll the whole form to find the one submit button. */
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pico-spacing);
+  padding: calc(var(--pico-spacing) * 0.75) 0;
+  background: var(--pico-background-color);
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+.sticky-actions > button,
+.sticky-actions > button[type="submit"] {
+  width: auto;
+  margin-bottom: 0;
+}
+
 /* Action rows: primary and secondary side by side, sized to their label
    instead of two identical full-width bars stacked vertically. */
 .actions {
