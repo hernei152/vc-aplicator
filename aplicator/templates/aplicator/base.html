@@ -23,9 +23,11 @@
   </nav>
   {% endwith %}
   {% if messages %}
-    {% for message in messages %}
-      <article>{{ message }}</article>
-    {% endfor %}
+    <div class="container" role="status" aria-live="polite">
+      {% for message in messages %}
+        <p class="flash flash-{{ message.level_tag }}">{{ message }}</p>
+      {% endfor %}
+    </div>
   {% endif %}
   <main class="container">
     {% block content %}{% endblock %}

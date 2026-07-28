@@ -15,6 +15,24 @@ a.danger {
   border: none;
 }
 
+/* Flash messages: flat status strip, not a Pico card. Colour carries the
+   level, but the message text always says what happened on its own. */
+.flash {
+  margin-bottom: var(--pico-spacing);
+  padding: calc(var(--pico-spacing) * 0.5) var(--pico-spacing);
+  border-left: 4px solid var(--pico-muted-border-color);
+  background: var(--pico-code-background-color);
+}
+.flash-success {
+  border-left-color: var(--pico-ins-color);
+}
+.flash-error {
+  border-left-color: var(--pico-del-color);
+}
+.flash-warning {
+  border-left-color: var(--pico-mark-background-color);
+}
+
 /* Fieldset legends are the real section headings on the answer pages.
    Pico renders them at body size/weight, so nothing is scannable. */
 fieldset > legend {
