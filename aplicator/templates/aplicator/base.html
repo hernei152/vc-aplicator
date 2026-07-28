@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="{% static 'aplicator/app.css' %}">
 </head>
 <body>
+  <a href="#contenido" class="skip-link">Saltar al contenido</a>
   {% with active=request.resolver_match.url_name %}
   <nav class="container">
     <ul>
@@ -29,7 +30,7 @@
       {% endfor %}
     </div>
   {% endif %}
-  <main class="container">
+  <main class="container" id="contenido" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
 </body>

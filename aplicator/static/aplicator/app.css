@@ -1,5 +1,19 @@
 /* Project layer on top of Pico. Only tokens Pico does not ship. */
 
+/* Off-screen until focused, so keyboard users can jump the nav. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: calc(var(--pico-spacing) * 0.5) var(--pico-spacing);
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+}
+.skip-link:focus {
+  left: 0;
+}
+
 /* Destructive actions must never look like save actions.
    Selector needs the element to outrank Pico's own [type=submit] rule. */
 button.danger,
